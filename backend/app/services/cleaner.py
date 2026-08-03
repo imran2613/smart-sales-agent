@@ -1,4 +1,4 @@
-﻿import re
+import re
 from collections import OrderedDict
 
 NOISE_PATTERNS = [
@@ -14,7 +14,7 @@ def remove_noise(text: str) -> str:
     lines = []
     for line in re.split(r"[\r\n]+", text):
         cleaned = normalize_whitespace(line)
-        if len(cleaned) < 25:
+        if len(cleaned) < 5:
             continue
         if any(re.search(pattern, cleaned, flags=re.IGNORECASE) for pattern in NOISE_PATTERNS):
             continue
