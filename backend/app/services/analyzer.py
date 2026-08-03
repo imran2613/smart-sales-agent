@@ -2,7 +2,8 @@ from __future__ import annotations
 import json
 import re
 from typing import Any
-from openai import OpenAI
+from google import genai
+from google.genai import types
 from app.config import Settings
 from app.models import SalesAnalysis
 
@@ -91,13 +92,17 @@ def parse_analysis(payload: str) -> SalesAnalysis:
     return SalesAnalysis.model_validate(data)
 
 def analyze_company(company_name: str, clean_text: str, settings: Settings) -> SalesAnalysis:
-    if not settings.openai_api_key:
+    if not settings.gemini_api_key:
         return local_analysis(company_name, clean_text)
-    client = OpenAI(api_key=settings.openai_api_key)
-    response = client.chat.completions.create(
-        model=settings.openai_model,
-        messages=[{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": build_llm_prompt(company_name, clean_text)}],
-        response_format={"type": "json_object"},
-        temperature=0.2,
+    client = genai.Client(api_key=settings.gemini_api_key)
+    response = client.models.generate_content(
+        model=settings.gemini_model,
+        contents=build_llm_prompt(company_name, clean_text),
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=SalesAnalysis,
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.2,
+        ),
     )
-    return parse_analysis(response.choices[0].message.content or "{}")
+    return parse_analysis(response.text or "{}")

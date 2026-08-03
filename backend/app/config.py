@@ -1,10 +1,10 @@
-﻿from functools import lru_cache
+from functools import lru_cache
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    openai_api_key: str | None = None
-    openai_model: str = "gpt-4.1-mini"
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-2.5-flash"
     max_pages: int = 6
     request_timeout_seconds: int = 12
     user_agent: str = "SalesResearchCopilot/1.0"
