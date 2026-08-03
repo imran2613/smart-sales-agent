@@ -22,6 +22,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.responses import JSONResponse
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=400,
+        content={"detail": f"Server crash: {type(exc).__name__}: {str(exc)}"},
+        headers={"Access-Control-Allow-Origin": "*"}
+    )
+
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
